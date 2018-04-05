@@ -34,7 +34,7 @@ loop() {
         case UP:
             // Check for requests in direction of travel
             if (EF & UP_REQ) {
-                EOPEN = OFF;
+                EOPEN = ON;
                 door = OPEN;
             } else {
                 // Prioritize requests in direction of travel
