@@ -20,7 +20,7 @@
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.NUMERIC.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx primitives in this code.
@@ -59,15 +59,15 @@ architecture Behavioral of controller is
     signal QDOWN : std_logic; -- elevator travelling down
 begin
     -- Internal signals
-    BL_MASK <= - unsigned(EF);
+    BL_MASK <= unsigned(EF) - 1;
     AB_MASK <= not(BL_MASK) sll 1;
-    ALL_REQ <= UP_REQ or DN_REQ or GO_REQ;
-    AB_REQ <= (ALL_REQ and AB_MASK) > 0;
-    BL_REQ <= (ALL_REQ and BL_MASK) > 0;
+    ALL_REQ <= unsigned(('0' & UP_REQ) or (DN_REQ & '0') or GO_REQ);
+    AB_REQ <= '1' when (ALL_REQ and AB_MASK) > 0 else '0';
+    BL_REQ <= '1' when (ALL_REQ and BL_MASK) > 0 else '0';
     
-    EF_UP_REQ <= (EF and UP_REQ) > 0;
-    EF_DN_REQ <= (EF and DN_REQ) > 0;
-    EF_GO_REQ <= (EF and GO_REQ) > 0;
+    EF_UP_REQ <= '1' when unsigned(EF and ('0' & UP_REQ)) > 0 else '0';
+    EF_DN_REQ <= '1' when unsigned(EF and (DN_REQ & '0')) > 0 else '0';
+    EF_GO_REQ <= '1' when unsigned(EF and GO_REQ) > 0 else '0';
     
     -- Output
     FLOOR_IND <= EF; -- (honestly, why is this even here?)
