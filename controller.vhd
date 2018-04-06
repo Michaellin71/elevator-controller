@@ -19,6 +19,7 @@
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC.ALL;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
@@ -45,9 +46,16 @@ entity controller is
 end controller;
 
 architecture Behavioral of controller is
-
+	signal AB_MASK : unsigned(3 downto 0);
+	signal BL_MASK : unsigned(3 downto 0);
+	signal ALL_REQ : unsigned(3 downto 0);
+	signal AB_REQ : std_logic;
+	signal BL_REQ : std_logic;
 begin
-
-
+	BL_MASK <= - unsigned(EF);
+	AB_MASK <= not(BL_MASK) sll 1;
+	ALL_REQ <= UP_REQ or DN_REQ or GO_REQ;
+	AB_REQ <= (ALL_REQ and AB_MASK) > 0;
+	BL_REQ <= (ALL_REQ and BL_MASK) > 0;
 end Behavioral;
 
