@@ -1,11 +1,12 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
+-- Company:        The Ohio State University
+-- Engineers:      Arvin Ignaci <ignaci.1@osu.edu>
+--                 Alex Whitman <whitman.97@osu.edu>
 -- 
 -- Create Date:    12:34:57 04/04/2018 
--- Design Name: 
+-- Design Name:    ElevatorController
 -- Module Name:    controller - Behavioral 
--- Project Name: 
+-- Project Name:   ECE 3561 Project 3
 -- Target Devices: 
 -- Tool versions: 
 -- Description: 
@@ -21,10 +22,6 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC.ALL;
 
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
-
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx primitives in this code.
 --library UNISIM;
@@ -37,8 +34,8 @@ entity controller is
            POC : in  STD_LOGIC;
            SYSCLK : in  STD_LOGIC;
            FLOOR_IND : out  STD_LOGIC_VECTOR (3 downto 0);
-           EMVUP : buffer  STD_LOGIC;
-           EMVDN : buffer  STD_LOGIC;
+           EMVUP : out  STD_LOGIC;
+           EMVDN : out  STD_LOGIC;
            EOPEN : out  STD_LOGIC;
            ECLOSE : out  STD_LOGIC;
            ECOMP : in  STD_LOGIC;
@@ -52,6 +49,10 @@ architecture Behavioral of controller is
                                            -- request for each floor
     signal AB_REQ : std_logic; -- request above current floor
     signal BL_REQ : std_logic; -- request below current floor
+    
+    signal DOOR : std_logic; -- 0 when door closed, 1 if door open
+    signal UP : std_logic; -- elevator travelling up
+    signal DOWN : std_logic; -- elevator travelling down
 begin
     BL_MASK <= - unsigned(EF);
     AB_MASK <= not(BL_MASK) sll 1;
@@ -65,6 +66,11 @@ begin
         if SYSCLK'event and SYSCLK='1' then
             -- Power-on clear
             if POC='1' then
+                FLOOR_IND <= (others => '0');
+                EMVUP <= '0';
+                EMVDN <= '0';
+                EOPEN <= '0';
+                ECLOSE <= '0';
                 
             -- Elevator has no running operations
             elsif ECOMP='1' then
