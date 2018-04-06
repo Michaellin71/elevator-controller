@@ -50,36 +50,113 @@ architecture Behavioral of controller is
     signal AB_REQ : std_logic; -- request above current floor
     signal BL_REQ : std_logic; -- request below current floor
     
+    signal EF_UP_REQ : std_logic; -- up request at current floor
+    signal EF_DN_REQ : std_logic; -- down request at current floor
+    signal EF_GO_REQ : std_logic; -- go request at current floor
+    
     signal QDOOR : std_logic; -- 0 when door closed, 1 if door open
     signal QUP   : std_logic; -- elevator travelling up
     signal QDOWN : std_logic; -- elevator travelling down
 begin
+    -- Internal signals
     BL_MASK <= - unsigned(EF);
     AB_MASK <= not(BL_MASK) sll 1;
     ALL_REQ <= UP_REQ or DN_REQ or GO_REQ;
     AB_REQ <= (ALL_REQ and AB_MASK) > 0;
     BL_REQ <= (ALL_REQ and BL_MASK) > 0;
     
+    EF_UP_REQ <= (EF and UP_REQ) > 0;
+    EF_DN_REQ <= (EF and DN_REQ) > 0;
+    EF_GO_REQ <= (EF and GO_REQ) > 0;
+    
+    -- Output
+    FLOOR_IND <= EF; -- (honestly, why is this even here?)
+    
     -- Handle active clock edge
     process (SYSCLK)
     begin
         if SYSCLK'event and SYSCLK='1' then
-            -- Power-on clear
+        
+            -- Clear outputs
+            EOPEN <= '0';
+            ECLOSE <= '0';
+            EMVUP <= '0';
+            EMVDN <= '0';
+            
+            -- Power-on clear (clear state)
             if POC='1' then
-                -- Clear state
                 QDOOR <= '0';
                 QUP <= '0';
                 QDOWN <= '0';
                 
-                -- Clear outputs
-                FLOOR_IND <= (others => '0');
-                EMVUP <= '0';
-                EMVDN <= '0';
-                EOPEN <= '0';
-                ECLOSE <= '0';
-                
             -- Elevator has no running operations
             elsif ECOMP='1' then
+                
+                -- Close door if open
+                if QDOOR='1' then
+                    ECLOSE <= '1';
+                    QDOOR <= '0';
+                
+                -- Service 'go' request at current floor
+                elsif EF_GO_REQ='1' then
+                    QDOOR <= '1';
+                    
+                -- Elevator is travelling up
+                elsif QUP='1' then
+                    
+                    -- Up request at current floor
+                    if EF_UP_REQ='1' then
+                        QDOOR <= '1';
+                    
+                    -- Request above current floor
+                    elsif AB_REQ='1' then
+                    
+                    -- Request below current floor
+                    elsif BL_REQ='1' then
+                        QUP <= '0';
+                        QDOWN <= '1';
+                        
+                    -- No requests
+                    else
+                        QUP <= '0';
+                    end if;
+                    
+                -- Elevator is travelling down
+                elsif QDOWN='1' then
+                    
+                    -- Up request at current floor
+                    if EF_DN_REQ='1' then
+                        QDOOR <= '1';
+                    
+                    -- Request below current floor
+                    elsif BL_REQ='1' then
+                    
+                    -- Request above current floor
+                    elsif AB_REQ='1' then
+                        QUP <= '1';
+                        QDOWN <= '0';
+                        
+                    -- No requests
+                    else
+                        QDOWN <= '0';
+                    end if;
+                    
+                -- Elevator is standing still
+                else
+                    
+                    if EF_UP_REQ='1' then
+                        QUP <= '1';
+                    elsif EF_DN_REQ='1' then
+                        QDOWN <= '1';
+                    end if;
+                    
+                end if;
+                
+                -- Set output based on state
+                EOPEN <= QDOOR;
+                EMVUP <= QUP and not(QDOWN);
+                EMVDN <= QDOWN and not(QUP);
+                -- NOTE: ECLOSE is set separately, only when necessary
                 
             end if;
         end if;
