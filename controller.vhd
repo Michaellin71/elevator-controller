@@ -50,9 +50,9 @@ architecture Behavioral of controller is
     signal AB_REQ : std_logic; -- request above current floor
     signal BL_REQ : std_logic; -- request below current floor
     
-    signal DOOR : std_logic; -- 0 when door closed, 1 if door open
-    signal UP : std_logic; -- elevator travelling up
-    signal DOWN : std_logic; -- elevator travelling down
+    signal QDOOR : std_logic; -- 0 when door closed, 1 if door open
+    signal QUP   : std_logic; -- elevator travelling up
+    signal QDOWN : std_logic; -- elevator travelling down
 begin
     BL_MASK <= - unsigned(EF);
     AB_MASK <= not(BL_MASK) sll 1;
@@ -66,6 +66,12 @@ begin
         if SYSCLK'event and SYSCLK='1' then
             -- Power-on clear
             if POC='1' then
+                -- Clear state
+                QDOOR <= '0';
+                QUP <= '0';
+                QDOWN <= '0';
+                
+                -- Clear outputs
                 FLOOR_IND <= (others => '0');
                 EMVUP <= '0';
                 EMVDN <= '0';
