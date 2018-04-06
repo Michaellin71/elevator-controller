@@ -76,7 +76,6 @@ begin
     process (SYSCLK)
     begin
         if SYSCLK'event and SYSCLK='1' then
-        
             -- Clear outputs
             EOPEN <= '0';
             ECLOSE <= '0';
@@ -91,7 +90,6 @@ begin
                 
             -- Elevator has no running operations
             elsif ECOMP='1' then
-                
                 -- Close door if open
                 if QDOOR='1' then
                     ECLOSE <= '1';
@@ -103,19 +101,15 @@ begin
                     
                 -- Elevator is travelling up
                 elsif QUP='1' then
-                    
                     -- Up request at current floor
                     if EF_UP_REQ='1' then
                         QDOOR <= '1';
-                    
                     -- Request above current floor
                     elsif AB_REQ='1' then
-                    
                     -- Request below current floor
                     elsif BL_REQ='1' then
                         QUP <= '0';
                         QDOWN <= '1';
-                        
                     -- No requests
                     else
                         QUP <= '0';
@@ -123,19 +117,15 @@ begin
                     
                 -- Elevator is travelling down
                 elsif QDOWN='1' then
-                    
                     -- Up request at current floor
                     if EF_DN_REQ='1' then
                         QDOOR <= '1';
-                    
                     -- Request below current floor
                     elsif BL_REQ='1' then
-                    
                     -- Request above current floor
                     elsif AB_REQ='1' then
                         QUP <= '1';
                         QDOWN <= '0';
-                        
                     -- No requests
                     else
                         QDOWN <= '0';
@@ -143,7 +133,6 @@ begin
                     
                 -- Elevator is standing still
                 else
-                    
                     if EF_UP_REQ='1' then
                         QUP <= '1';
                     elsif EF_DN_REQ='1' then
@@ -157,7 +146,6 @@ begin
                 EMVUP <= QUP and not(QDOWN);
                 EMVDN <= QDOWN and not(QUP);
                 -- NOTE: ECLOSE is set separately, only when necessary
-                
             end if;
         end if;
     end process;
