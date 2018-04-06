@@ -37,8 +37,8 @@ entity controller is
            POC : in  STD_LOGIC;
            SYSCLK : in  STD_LOGIC;
            FLOOR_IND : out  STD_LOGIC_VECTOR (3 downto 0);
-           EMVUP : out  STD_LOGIC;
-           EMVDN : out  STD_LOGIC;
+           EMVUP : buffer  STD_LOGIC;
+           EMVDN : buffer  STD_LOGIC;
            EOPEN : out  STD_LOGIC;
            ECLOSE : out  STD_LOGIC;
            ECOMP : in  STD_LOGIC;
@@ -46,16 +46,31 @@ entity controller is
 end controller;
 
 architecture Behavioral of controller is
-	signal AB_MASK : unsigned(3 downto 0);
-	signal BL_MASK : unsigned(3 downto 0);
-	signal ALL_REQ : unsigned(3 downto 0);
-	signal AB_REQ : std_logic;
-	signal BL_REQ : std_logic;
+    signal AB_MASK : unsigned(3 downto 0); -- bitmask for floors above current
+    signal BL_MASK : unsigned(3 downto 0); -- bitmask for floors below current
+    signal ALL_REQ : unsigned(3 downto 0); -- stores whether or not there is a
+                                           -- request for each floor
+    signal AB_REQ : std_logic; -- request above current floor
+    signal BL_REQ : std_logic; -- request below current floor
 begin
-	BL_MASK <= - unsigned(EF);
-	AB_MASK <= not(BL_MASK) sll 1;
-	ALL_REQ <= UP_REQ or DN_REQ or GO_REQ;
-	AB_REQ <= (ALL_REQ and AB_MASK) > 0;
-	BL_REQ <= (ALL_REQ and BL_MASK) > 0;
+    BL_MASK <= - unsigned(EF);
+    AB_MASK <= not(BL_MASK) sll 1;
+    ALL_REQ <= UP_REQ or DN_REQ or GO_REQ;
+    AB_REQ <= (ALL_REQ and AB_MASK) > 0;
+    BL_REQ <= (ALL_REQ and BL_MASK) > 0;
+    
+    -- Handle active clock edge
+    process (SYSCLK)
+    begin
+        if SYSCLK'event and SYSCLK='1' then
+            -- Power-on clear
+            if POC='1' then
+                
+            -- Elevator has no running operations
+            elsif ECOMP='1' then
+                
+            end if;
+        end if;
+    end process;
 end Behavioral;
 
