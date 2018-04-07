@@ -6,7 +6,7 @@
 -- Create Date:    12:34:57 04/04/2018 
 -- Design Name:    ElevatorController
 -- Module Name:    controller - Behavioral 
--- Project Name:   ECE 3561 Project 3
+-- Project Name:   ece3561_proj3
 -- Target Devices: 
 -- Tool versions: 
 -- Description: 
@@ -92,7 +92,7 @@ begin
             elsif ECOMP='1' then
                 -- Close door if open
                 if QDOOR='1' then
-                    ECLOSE <= '1';
+                    ECLOSE <= '1'; -- ECLOSE is only set here.
                     QDOOR <= '0';
                 
                 -- Service 'go' request at current floor
@@ -145,7 +145,8 @@ begin
                 EOPEN <= QDOOR;
                 EMVUP <= QUP and not(QDOWN);
                 EMVDN <= QDOWN and not(QUP);
-                -- NOTE: ECLOSE is set separately, only when necessary
+                -- NOTE: ECLOSE is set earlier, only when necessary
+                
             end if;
         end if;
     end process;
