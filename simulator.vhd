@@ -1,121 +1,90 @@
---------------------------------------------------------------------------------
--- Company:       The Ohio State University
--- Engineers:     Arvin Ignaci <ignaci.1@osu.edu>
---                Alex Whitman <whitman.97@osu.edu>
+----------------------------------------------------------------------------------
+-- Company:        The Ohio State University
+-- Engineers:      Arvin Ignaci <ignaci.1@osu.edu>
+--                 Alex Whitman <whitman.97@osu.edu>
+-- 
+-- Create Date:    12:40:17 04/11/2018 
+-- Design Name: 
+-- Module Name:    simulator - Behavioral 
+-- Project Name: 
+-- Target Devices: 
+-- Tool versions: 
+-- Description: 
 --
--- Create Date:   11:39:06 04/07/2018
--- Design Name:   ElevatorController
--- Module Name:   simulator
--- Project Name:  ece3561_proj3
--- Target Device:  
--- Tool versions:  
--- Description:   
--- 
--- VHDL Test Bench Created by ISE for module: controller
--- 
--- Dependencies:
--- 
--- Revision:
+-- Dependencies: 
+--
+-- Revision: 
 -- Revision 0.01 - File Created
--- Additional Comments:
+-- Additional Comments: 
 --
--- Notes: 
--- This testbench has been automatically generated using types std_logic and
--- std_logic_vector for the ports of the unit under test.  Xilinx recommends
--- that these types always be used for the top-level I/O of a design in order
--- to guarantee that the testbench will bind correctly to the post-implementation 
--- simulation model.
---------------------------------------------------------------------------------
-LIBRARY ieee;
-USE ieee.std_logic_1164.ALL;
- 
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---USE ieee.numeric_std.ALL;
- 
-ENTITY simulator IS
-END simulator;
- 
-ARCHITECTURE behavior OF simulator IS 
- 
-    -- Component Declaration for the Unit Under Test (UUT)
- 
-    COMPONENT controller
-    PORT(
-         UP_REQ : IN  std_logic_vector(2 downto 0);
-         DN_REQ : IN  std_logic_vector(3 downto 1);
-         GO_REQ : IN  std_logic_vector(3 downto 0);
-         POC : IN  std_logic;
-         SYSCLK : IN  std_logic;
-         FLOOR_IND : OUT  std_logic_vector(3 downto 0);
-         EMVUP : OUT  std_logic;
-         EMVDN : OUT  std_logic;
-         EOPEN : OUT  std_logic;
-         ECLOSE : OUT  std_logic;
-         ECOMP : IN  std_logic;
-         EF : IN  std_logic_vector(3 downto 0)
-        );
-    END COMPONENT;
+----------------------------------------------------------------------------------
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx primitives in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity simulator is
+    Port ( POC : in  STD_LOGIC;
+           SYSCLK : in  STD_LOGIC;
+           EMVUP : in  STD_LOGIC;
+           EMVDN : in  STD_LOGIC;
+           EOPEN : in  STD_LOGIC;
+           ECLOSE : in  STD_LOGIC;
+           ECOMP : buffer STD_LOGIC;
+           EF : out  STD_LOGIC_VECTOR (3 downto 0));
+end simulator;
+
+architecture Behavioral of simulator is
+    -- Internal signals
+    signal EDOOR : std_logic; -- asserted for door command from controller
+    signal EINPUT : std_logic; -- asserted for inputs from controller
+    signal EFLOOR : unsigned(3 downto 0); -- current floor as unsigned int
     
+    signal COUNTER : unsigned(2 downto 0); -- counter for delay operations
+    
+begin
+    EDOOR <= EOPEN or ECLOSE;
+    EINPUT <= EMVUP or EMVDN or EDOOR;
+    EF <= std_logic_vector(EFLOOR);
 
-   --Inputs
-   signal UP_REQ : std_logic_vector(2 downto 0) := (others => '0');
-   signal DN_REQ : std_logic_vector(3 downto 1) := (others => '0');
-   signal GO_REQ : std_logic_vector(3 downto 0) := (others => '0');
-   signal POC : std_logic := '0';
-   signal SYSCLK : std_logic := '0';
-   signal ECOMP : std_logic := '0';
-   signal EF : std_logic_vector(3 downto 0) := (others => '0');
+    process (SYSCLK)
+    begin
+        if SYSCLK'event and SYSCLK='1' then
+        
+            -- Power-on clear
+            if POC='1' then
+                EFLOOR <= "0001";   -- reset floor to 1
+                ECOMP <= '1';
+                
+            -- Ongoing operation
+            elsif ECOMP='0' then
+                if COUNTER="000" then
+                    ECOMP <= '1';
+                else
+                    COUNTER <= COUNTER - 1;
+                end if;
+            
+            -- Handle input from controller
+            elsif EINPUT='1' then
+                ECOMP <= '0';   -- start blocking operation
+                
+                if EDOOR='1' then
+                    COUNTER <= "110";   -- set counter to 6
+                else
+                    COUNTER <= "100";   -- set counter to 4
+                    if EMVUP='1' then
+                        EFLOOR <= EFLOOR sll 1;
+                    elsif EMVDN='1' then
+                        EFLOOR <= EFLOOR srl 1;
+                    end if;
+                end if;
 
- 	--Outputs
-   signal FLOOR_IND : std_logic_vector(3 downto 0);
-   signal EMVUP : std_logic;
-   signal EMVDN : std_logic;
-   signal EOPEN : std_logic;
-   signal ECLOSE : std_logic;
+            end if;
+        end if;
+    end process;
+end Behavioral;
 
-   -- Clock period definitions
-   constant SYSCLK_period : time := 10 ns;
- 
-BEGIN
- 
-	-- Instantiate the Unit Under Test (UUT)
-   uut: controller PORT MAP (
-          UP_REQ => UP_REQ,
-          DN_REQ => DN_REQ,
-          GO_REQ => GO_REQ,
-          POC => POC,
-          SYSCLK => SYSCLK,
-          FLOOR_IND => FLOOR_IND,
-          EMVUP => EMVUP,
-          EMVDN => EMVDN,
-          EOPEN => EOPEN,
-          ECLOSE => ECLOSE,
-          ECOMP => ECOMP,
-          EF => EF
-        );
-
-   -- Clock process definitions
-   SYSCLK_process :process
-   begin
-		SYSCLK <= '0';
-		wait for SYSCLK_period/2;
-		SYSCLK <= '1';
-		wait for SYSCLK_period/2;
-   end process;
- 
-
-   -- Stimulus process
-   stim_proc: process
-   begin		
-      -- hold reset state for 100 ns.
-      wait for 100 ns;	
-
-      wait for SYSCLK_period*10;
-
-      -- insert stimulus here 
-
-      wait;
-   end process;
-
-END;
