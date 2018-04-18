@@ -76,9 +76,9 @@ begin
                     COUNTER <= "110";   -- set counter to 6
                 else
                     COUNTER <= "100";   -- set counter to 4
-                    if EMVUP='1' then
+                    if EMVUP='1' and EFLOOR(3)='0' then
                         EFLOOR <= EFLOOR sll 1;
-                    elsif EMVDN='1' then
+                    elsif EMVDN='1' and EFLOOR(0)='0' then
                         EFLOOR <= EFLOOR srl 1;
                     end if;
                 end if;
