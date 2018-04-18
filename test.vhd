@@ -71,20 +71,20 @@ ARCHITECTURE behavior OF test IS
     END COMPONENT;
 
     --Controller Inputs
-    signal UP_REQ : std_logic_vector(2 downto 0);
-    signal DN_REQ : std_logic_vector(3 downto 1);
-    signal GO_REQ : std_logic_vector(3 downto 0);
-    signal POC : std_logic;
-    signal SYSCLK : std_logic;
-    signal ECOMP : std_logic := '0';
+    signal UP_REQ : std_logic_vector(2 downto 0) := (others => '0');
+    signal DN_REQ : std_logic_vector(3 downto 1) := (others => '0');
+    signal GO_REQ : std_logic_vector(3 downto 0) := (others => '0');
+    signal POC : std_logic := '1';
+    signal SYSCLK : std_logic := '0';
+    signal ECOMP : std_logic := '1';
     signal EF : std_logic_vector(3 downto 0) := (others => '0');
 
     --Controller Outputs
-    signal FLOOR_IND : std_logic_vector(3 downto 0);
-    signal EMVUP : std_logic;
-    signal EMVDN : std_logic;
-    signal EOPEN : std_logic;
-    signal ECLOSE : std_logic;
+    signal FLOOR_IND : std_logic_vector(3 downto 0) := (others => '0');
+    signal EMVUP : std_logic := '0';
+    signal EMVDN : std_logic := '0';
+    signal EOPEN : std_logic := '0';
+    signal ECLOSE : std_logic := '0';
 
     -- Clock period definitions
     constant SYSCLK_period : time := 500 ms;
@@ -129,10 +129,8 @@ BEGIN
     -- Stimulus process
     stim_proc: process
     begin		
-        -- hold reset state for 100 ns.
-        wait for 100 ns;	
 
-        wait for SYSCLK_period*10;
+        wait for SYSCLK_period;
 
         -- insert stimulus here
 

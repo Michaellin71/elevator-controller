@@ -1,13 +1,16 @@
 _xmsgs
 *.bld
+*.cmd
 *.cmd_log
 *.csv
 *.err
+*.exe
 *.gise
 *.gyd
 *.html
 *.ini
 *.jed
+*.log
 *.lso
 *.mfd
 *.nga
@@ -26,6 +29,7 @@ _xmsgs
 *.tspec
 *.vdb
 *.vm6
+*.wdb
 *.xst
 *.xrpt
 *.xml
@@ -33,5 +37,6 @@ _xmsgs
 _ngo
 controller_html
 iseconfig
+isim
 xlnx_auto_*
 xst
