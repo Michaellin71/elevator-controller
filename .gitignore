@@ -24,6 +24,7 @@ _xmsgs
 *.stx
 *.tim
 *.tspec
+*.vdb
 *.vm6
 *.xst
 *.xrpt

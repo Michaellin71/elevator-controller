@@ -34,14 +34,6 @@ USE ieee.std_logic_1164.ALL;
 --USE ieee.numeric_std.ALL;
  
 ENTITY test IS
-    PORT(
-         UP_REQ : IN  std_logic_vector(2 downto 0);
-         DN_REQ : IN  std_logic_vector(3 downto 1);
-         GO_REQ : IN  std_logic_vector(3 downto 0);
-         POC : IN  std_logic;
-         SYSCLK : IN  std_logic;
-         FLOOR_IND : OUT  std_logic_vector(3 downto 0);
-        );
 END test;
  
 ARCHITECTURE behavior OF test IS 
@@ -79,10 +71,16 @@ ARCHITECTURE behavior OF test IS
     END COMPONENT;
 
     --Controller Inputs
+    signal UP_REQ : std_logic_vector(2 downto 0);
+    signal DN_REQ : std_logic_vector(3 downto 1);
+    signal GO_REQ : std_logic_vector(3 downto 0);
+    signal POC : std_logic;
+    signal SYSCLK : std_logic;
     signal ECOMP : std_logic := '0';
     signal EF : std_logic_vector(3 downto 0) := (others => '0');
 
     --Controller Outputs
+    signal FLOOR_IND : std_logic_vector(3 downto 0);
     signal EMVUP : std_logic;
     signal EMVDN : std_logic;
     signal EOPEN : std_logic;
@@ -106,8 +104,7 @@ BEGIN
           EOPEN => EOPEN,
           ECLOSE => ECLOSE,
           ECOMP => ECOMP,
-          EF => EF
-        );
+          EF => EF );
         
     sim: simulator PORT MAP (
           POC => POC,
@@ -117,8 +114,7 @@ BEGIN
           EOPEN => EOPEN,
           ECLOSE => ECLOSE,
           ECOMP => ECOMP,
-          EF => EF
-        );
+          EF => EF );
 
     -- Clock process definitions
     SYSCLK_process :process
