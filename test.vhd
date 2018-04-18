@@ -11,7 +11,7 @@
 -- Tool versions:  
 -- Description:   
 -- 
--- VHDL Test Bench Created by ISE for module: controller
+-- VHDL Test Bench Created by ISE for module: elevator
 -- 
 -- Dependencies:
 -- 
@@ -40,51 +40,26 @@ ARCHITECTURE behavior OF test IS
  
     -- Component Declaration for the Unit Under Test (UUT)
  
-    COMPONENT controller
+    COMPONENT elevator
     PORT(
          UP_REQ : IN  std_logic_vector(2 downto 0);
          DN_REQ : IN  std_logic_vector(3 downto 1);
          GO_REQ : IN  std_logic_vector(3 downto 0);
          POC : IN  std_logic;
          SYSCLK : IN  std_logic;
-         FLOOR_IND : OUT  std_logic_vector(3 downto 0);
-         EMVUP : OUT  std_logic;
-         EMVDN : OUT  std_logic;
-         EOPEN : OUT  std_logic;
-         ECLOSE : OUT  std_logic;
-         ECOMP : IN  std_logic;
-         EF : IN  std_logic_vector(3 downto 0)
-        );
-    END COMPONENT;
-       
-    COMPONENT simulator
-    PORT(
-         POC : IN  std_logic;
-         SYSCLK : IN  std_logic;
-         EMVUP : IN  std_logic;
-         EMVDN : IN  std_logic;
-         EOPEN : IN  std_logic;
-         ECLOSE : IN  std_logic;
-         ECOMP : BUFFER std_logic;
-         EF : OUT  std_logic_vector (3 downto 0)
+         FLOOR_IND : OUT  std_logic_vector(3 downto 0)
         );
     END COMPONENT;
 
-    --Controller Inputs
+    --Inputs
     signal UP_REQ : std_logic_vector(2 downto 0) := (others => '0');
     signal DN_REQ : std_logic_vector(3 downto 1) := (others => '0');
     signal GO_REQ : std_logic_vector(3 downto 0) := (others => '0');
     signal POC : std_logic := '1';
     signal SYSCLK : std_logic := '0';
-    signal ECOMP : std_logic := '1';
-    signal EF : std_logic_vector(3 downto 0) := (others => '0');
-
-    --Controller Outputs
+    
+    --Outputs
     signal FLOOR_IND : std_logic_vector(3 downto 0) := (others => '0');
-    signal EMVUP : std_logic := '0';
-    signal EMVDN : std_logic := '0';
-    signal EOPEN : std_logic := '0';
-    signal ECLOSE : std_logic := '0';
 
     -- Clock period definitions
     constant SYSCLK_period : time := 500 ms;
@@ -92,29 +67,14 @@ ARCHITECTURE behavior OF test IS
 BEGIN
  
     -- Instantiate the Unit Under Test (UUT)
-    uut: controller PORT MAP (
+    uut: elevator PORT MAP (
           UP_REQ => UP_REQ,
           DN_REQ => DN_REQ,
           GO_REQ => GO_REQ,
           POC => POC,
           SYSCLK => SYSCLK,
-          FLOOR_IND => FLOOR_IND,
-          EMVUP => EMVUP,
-          EMVDN => EMVDN,
-          EOPEN => EOPEN,
-          ECLOSE => ECLOSE,
-          ECOMP => ECOMP,
-          EF => EF );
-        
-    sim: simulator PORT MAP (
-          POC => POC,
-          SYSCLK => SYSCLK,
-          EMVUP => EMVUP,
-          EMVDN => EMVDN,
-          EOPEN => EOPEN,
-          ECLOSE => ECLOSE,
-          ECOMP => ECOMP,
-          EF => EF );
+          FLOOR_IND => FLOOR_IND );
+    
 
     -- Clock process definitions
     SYSCLK_process :process
