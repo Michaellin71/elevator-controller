@@ -47,16 +47,16 @@ architecture Behavioral of controller is
     signal BL_MASK : unsigned(3 downto 0); -- bitmask for floors below current
     signal ALL_REQ : unsigned(3 downto 0); -- stores whether or not there is a
                                            -- request for each floor
-    signal AB_REQ : std_logic; -- request above current floor
-    signal BL_REQ : std_logic; -- request below current floor
+    signal AB_REQ : STD_LOGIC; -- request above current floor
+    signal BL_REQ : STD_LOGIC; -- request below current floor
     
-    signal EF_UP_REQ : std_logic; -- up request at current floor
-    signal EF_DN_REQ : std_logic; -- down request at current floor
-    signal EF_GO_REQ : std_logic; -- go request at current floor
+    signal EF_UP_REQ : STD_LOGIC; -- up request at current floor
+    signal EF_DN_REQ : STD_LOGIC; -- down request at current floor
+    signal EF_GO_REQ : STD_LOGIC; -- go request at current floor
     
-    signal QDOOR : std_logic; -- 0 when door closed, 1 if door open
-    signal QUP   : std_logic; -- elevator travelling up
-    signal QDOWN : std_logic; -- elevator travelling down
+    signal QDOOR : STD_LOGIC; -- 0 when door closed, 1 if door open
+    signal QUP   : STD_LOGIC; -- elevator travelling up
+    signal QDOWN : STD_LOGIC; -- elevator travelling down
 begin
     -- Internal signals
     BL_MASK <= unsigned(EF) - 1;

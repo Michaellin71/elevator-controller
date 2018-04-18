@@ -40,16 +40,16 @@ end simulator;
 
 architecture Behavioral of simulator is
     -- Internal signals
-    signal EDOOR : std_logic; -- asserted for door command from controller
-    signal EINPUT : std_logic; -- asserted for inputs from controller
-    signal EFLOOR : unsigned(3 downto 0); -- current floor as unsigned int
+    signal EDOOR : STD_LOGIC; -- asserted for door command from controller
+    signal EINPUT : STD_LOGIC; -- asserted for inputs from controller
+    signal EFLOOR : UNSIGNED(3 downto 0); -- current floor as unsigned int
     
-    signal COUNTER : unsigned(2 downto 0); -- counter for delay operations
+    signal COUNTER : UNSIGNED(2 downto 0); -- counter for delay operations
     
 begin
     EDOOR <= EOPEN or ECLOSE;
     EINPUT <= EMVUP or EMVDN or EDOOR;
-    EF <= std_logic_vector(EFLOOR);
+    EF <= STD_LOGIC_VECTOR(EFLOOR);
 
     process (SYSCLK)
     begin

@@ -34,6 +34,14 @@ USE ieee.std_logic_1164.ALL;
 --USE ieee.numeric_std.ALL;
  
 ENTITY test IS
+    PORT(
+         UP_REQ : IN  std_logic_vector(2 downto 0);
+         DN_REQ : IN  std_logic_vector(3 downto 1);
+         GO_REQ : IN  std_logic_vector(3 downto 0);
+         POC : IN  std_logic;
+         SYSCLK : IN  std_logic;
+         FLOOR_IND : OUT  std_logic_vector(3 downto 0);
+        );
 END test;
  
 ARCHITECTURE behavior OF test IS 
@@ -70,29 +78,23 @@ ARCHITECTURE behavior OF test IS
         );
     END COMPONENT;
 
-   --Inputs
-   signal UP_REQ : std_logic_vector(2 downto 0) := (others => '0');
-   signal DN_REQ : std_logic_vector(3 downto 1) := (others => '0');
-   signal GO_REQ : std_logic_vector(3 downto 0) := (others => '0');
-   signal POC : std_logic := '0';
-   signal SYSCLK : std_logic := '0';
-   signal ECOMP : std_logic := '0';
-   signal EF : std_logic_vector(3 downto 0) := (others => '0');
+    --Controller Inputs
+    signal ECOMP : std_logic := '0';
+    signal EF : std_logic_vector(3 downto 0) := (others => '0');
 
- 	--Outputs
-   signal FLOOR_IND : std_logic_vector(3 downto 0);
-   signal EMVUP : std_logic;
-   signal EMVDN : std_logic;
-   signal EOPEN : std_logic;
-   signal ECLOSE : std_logic;
+    --Controller Outputs
+    signal EMVUP : std_logic;
+    signal EMVDN : std_logic;
+    signal EOPEN : std_logic;
+    signal ECLOSE : std_logic;
 
-   -- Clock period definitions
-   constant SYSCLK_period : time := 10 ns;
+    -- Clock period definitions
+    constant SYSCLK_period : time := 500 ms;
  
 BEGIN
  
-	-- Instantiate the Unit Under Test (UUT)
-   uut: controller PORT MAP (
+    -- Instantiate the Unit Under Test (UUT)
+    uut: controller PORT MAP (
           UP_REQ => UP_REQ,
           DN_REQ => DN_REQ,
           GO_REQ => GO_REQ,
@@ -107,7 +109,7 @@ BEGIN
           EF => EF
         );
         
-   sim: simulator PORT MAP (
+    sim: simulator PORT MAP (
           POC => POC,
           SYSCLK => SYSCLK,
           EMVUP => EMVUP,
@@ -118,27 +120,27 @@ BEGIN
           EF => EF
         );
 
-   -- Clock process definitions
-   SYSCLK_process :process
-   begin
-		SYSCLK <= '0';
-		wait for SYSCLK_period/2;
-		SYSCLK <= '1';
-		wait for SYSCLK_period/2;
-   end process;
- 
+    -- Clock process definitions
+    SYSCLK_process :process
+    begin
+        SYSCLK <= '0';
+        wait for SYSCLK_period/2;
+        SYSCLK <= '1';
+        wait for SYSCLK_period/2;
+    end process;
 
-   -- Stimulus process
-   stim_proc: process
-   begin		
-      -- hold reset state for 100 ns.
-      wait for 100 ns;	
 
-      wait for SYSCLK_period*10;
+    -- Stimulus process
+    stim_proc: process
+    begin		
+        -- hold reset state for 100 ns.
+        wait for 100 ns;	
 
-      -- insert stimulus here 
+        wait for SYSCLK_period*10;
 
-      wait;
-   end process;
+        -- insert stimulus here
+
+        wait;
+    end process;
 
 END;

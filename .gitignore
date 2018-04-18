@@ -6,6 +6,7 @@ _xmsgs
 *.gise
 *.gyd
 *.html
+*.ini
 *.jed
 *.lso
 *.mfd
@@ -27,6 +28,7 @@ _xmsgs
 *.xst
 *.xrpt
 *.xml
+*.xmsgs
 _ngo
 controller_html
 iseconfig
