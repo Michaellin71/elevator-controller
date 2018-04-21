@@ -35,7 +35,7 @@ _xmsgs
 *.xml
 *.xmsgs
 _ngo
-controller_html
+*_html
 iseconfig
 isim
 xlnx_auto_*
