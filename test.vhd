@@ -51,14 +51,14 @@ ARCHITECTURE behavior OF test IS
         );
     END COMPONENT;
 
-    --Inputs
+    -- Inputs
     signal UP_REQ : std_logic_vector(2 downto 0) := (others => '0');
     signal DN_REQ : std_logic_vector(3 downto 1) := (others => '0');
     signal GO_REQ : std_logic_vector(3 downto 0) := (others => '0');
     signal POC : std_logic := '1';
     signal SYSCLK : std_logic := '0';
     
-    --Outputs
+    -- Outputs
     signal FLOOR_IND : std_logic_vector(3 downto 0) := (others => '0');
 
     -- Clock period definitions
@@ -77,7 +77,7 @@ BEGIN
     
 
     -- Clock process definitions
-    SYSCLK_process :process
+    SYSCLK_process: process
     begin
         SYSCLK <= '0';
         wait for SYSCLK_period/2;
@@ -93,6 +93,7 @@ BEGIN
         wait for SYSCLK_period;
 
         -- insert stimulus here
+        POC <= '0';
 
         wait;
     end process;

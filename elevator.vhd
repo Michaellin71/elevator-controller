@@ -59,14 +59,14 @@ architecture Behavioral of elevator is
     
     component simulator
     port(
-         POC : in  STD_LOGIC;
-         SYSCLK : in  STD_LOGIC;
-         EMVUP : in  STD_LOGIC;
-         EMVDN : in  STD_LOGIC;
-         EOPEN : in  STD_LOGIC;
-         ECLOSE : in  STD_LOGIC;
-         ECOMP : buffer STD_LOGIC;
-         EF : out  STD_LOGIC_VECTOR (3 downto 0));
+        POC : in  STD_LOGIC;
+        SYSCLK : in  STD_LOGIC;
+        EMVUP : in  STD_LOGIC;
+        EMVDN : in  STD_LOGIC;
+        EOPEN : in  STD_LOGIC;
+        ECLOSE : in  STD_LOGIC;
+        ECOMP : buffer STD_LOGIC;
+        EF : out  STD_LOGIC_VECTOR(3 downto 0));
     end component;
     
     --Controller Inputs
