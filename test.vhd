@@ -135,25 +135,13 @@ BEGIN
         wait for SYSCLK_period;
 
         -- insert stimulus here
-        UP_REQ(2) <= '1';
-        
-        wait for 1000 ms;
-        UP_REQ(0) <= '1';
-        
-        wait for 1000 ms;
         DN_REQ(3) <= '1';
         
-        wait for 1000 ms;
-        GO_REQ(1) <= '1';
-        
-        wait for 1000 ms;
-        GO_REQ(1) <= '0';
-        
         wait for 11000 ms;
-        UP_REQ(2) <= '0';
-        
-        wait for 12000 ms;
         DN_REQ(3) <= '0';
+        
+        wait for 14000 ms;
+        GO_REQ(0) <= '1';
 
         wait;
     end process;
