@@ -40,26 +40,49 @@ ARCHITECTURE behavior OF test IS
  
     -- Component Declaration for the Unit Under Test (UUT)
  
-    COMPONENT elevator
-    PORT(
-         UP_REQ : IN  std_logic_vector(2 downto 0);
-         DN_REQ : IN  std_logic_vector(3 downto 1);
-         GO_REQ : IN  std_logic_vector(3 downto 0);
-         POC : IN  std_logic;
-         SYSCLK : IN  std_logic;
-         FLOOR_IND : OUT  std_logic_vector(3 downto 0)
-        );
-    END COMPONENT;
-
-    -- Inputs
-    signal UP_REQ : std_logic_vector(2 downto 0) := (others => '0');
-    signal DN_REQ : std_logic_vector(3 downto 1) := (others => '0');
-    signal GO_REQ : std_logic_vector(3 downto 0) := (others => '0');
-    signal POC : std_logic := '1';
-    signal SYSCLK : std_logic := '0';
+    component controller
+    port(
+        UP_REQ : in  STD_LOGIC_VECTOR(2 downto 0);
+        DN_REQ : in  STD_LOGIC_VECTOR(3 downto 1);
+        GO_REQ : in  STD_LOGIC_VECTOR(3 downto 0);
+        POC : in  STD_LOGIC;
+        SYSCLK : in  STD_LOGIC;
+        FLOOR_IND : out  STD_LOGIC_VECTOR(3 downto 0);
+        EMVUP : out  STD_LOGIC;
+        EMVDN : out  STD_LOGIC;
+        EOPEN : out  STD_LOGIC;
+        ECLOSE : out  STD_LOGIC;
+        ECOMP : in  STD_LOGIC;
+        EF : in  STD_LOGIC_VECTOR(3 downto 0));
+    end component;
     
-    -- Outputs
-    signal FLOOR_IND : std_logic_vector(3 downto 0) := (others => '0');
+    component simulator
+    port(
+        POC : in  STD_LOGIC;
+        SYSCLK : in  STD_LOGIC;
+        EMVUP : in  STD_LOGIC;
+        EMVDN : in  STD_LOGIC;
+        EOPEN : in  STD_LOGIC;
+        ECLOSE : in  STD_LOGIC;
+        ECOMP : buffer STD_LOGIC;
+        EF : out  STD_LOGIC_VECTOR(3 downto 0));
+    end component;
+
+    -- Controller Inputs
+    signal UP_REQ : STD_LOGIC_VECTOR(2 downto 0) := (others => '0');
+    signal DN_REQ : STD_LOGIC_VECTOR(3 downto 1) := (others => '0');
+    signal GO_REQ : STD_LOGIC_VECTOR(3 downto 0) := (others => '0');
+    signal POC : STD_LOGIC := '1';
+    signal SYSCLK : STD_LOGIC := '0';
+    signal ECOMP : STD_LOGIC := '0';
+    signal EF : STD_LOGIC_VECTOR(3 downto 0) := (others => '0');
+    
+    -- Controller Outputs
+    signal FLOOR_IND : STD_LOGIC_VECTOR(3 downto 0) := (others => '0');
+    signal EMVUP : STD_LOGIC := '0';
+    signal EMVDN : STD_LOGIC := '0';
+    signal EOPEN : STD_LOGIC := '0';
+    signal ECLOSE : STD_LOGIC := '0';
 
     -- Clock period definitions
     constant SYSCLK_period : time := 500 ms;
@@ -67,13 +90,29 @@ ARCHITECTURE behavior OF test IS
 BEGIN
  
     -- Instantiate the Unit Under Test (UUT)
-    uut: elevator PORT MAP (
-          UP_REQ => UP_REQ,
-          DN_REQ => DN_REQ,
-          GO_REQ => GO_REQ,
-          POC => POC,
-          SYSCLK => SYSCLK,
-          FLOOR_IND => FLOOR_IND );
+    con: controller port map(
+        UP_REQ => UP_REQ,
+        DN_REQ => DN_REQ,
+        GO_REQ => GO_REQ,
+        POC => POC,
+        SYSCLK => SYSCLK,
+        FLOOR_IND => FLOOR_IND,
+        EMVUP => EMVUP,
+        EMVDN => EMVDN,
+        EOPEN => EOPEN,
+        ECLOSE => ECLOSE,
+        ECOMP => ECOMP,
+        EF => EF );
+        
+    sim: simulator port map(
+        POC => POC,
+        SYSCLK => SYSCLK,
+        EMVUP => EMVUP,
+        EMVDN => EMVDN,
+        EOPEN => EOPEN,
+        ECLOSE => ECLOSE,
+        ECOMP => ECOMP,
+        EF => EF );
     
 
     -- Clock process definitions
@@ -84,16 +123,19 @@ BEGIN
         SYSCLK <= '1';
         wait for SYSCLK_period/2;
     end process;
-
-
+    
+    
     -- Stimulus process
     stim_proc: process
     begin		
 
         wait for SYSCLK_period;
+        POC <= '0';
+
+        wait for SYSCLK_period;
 
         -- insert stimulus here
-        POC <= '0';
+        UP_REQ(0) <= '1';
 
         wait;
     end process;
