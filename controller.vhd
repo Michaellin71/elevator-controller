@@ -43,9 +43,9 @@ entity controller is
 end controller;
 
 architecture Behavioral of controller is
-    signal AB_MASK : unsigned(3 downto 0); -- bitmask for floors above current
-    signal BL_MASK : unsigned(3 downto 0); -- bitmask for floors below current
-    signal ALL_REQ : unsigned(3 downto 0); -- stores whether or not there is a
+    signal AB_MASK : UNSIGNED(3 downto 0); -- bitmask for floors above current
+    signal BL_MASK : UNSIGNED(3 downto 0); -- bitmask for floors below current
+    signal ALL_REQ : STD_LOGIC_VECTOR(3 downto 0); -- stores whether or not there is a
                                            -- request for each floor
     signal AB_REQ : STD_LOGIC; -- request above current floor
     signal BL_REQ : STD_LOGIC; -- request below current floor
@@ -54,20 +54,25 @@ architecture Behavioral of controller is
     signal EF_DN_REQ : STD_LOGIC; -- down request at current floor
     signal EF_GO_REQ : STD_LOGIC; -- go request at current floor
     
-    signal QDOOR : STD_LOGIC; -- 0 when door closed, 1 if door open
-    signal QUP   : STD_LOGIC; -- elevator travelling up
+    signal EF_DOOR : STD_LOGIC; -- door needs to be opened at current floor
+    
+    signal QOPEN : STD_LOGIC; -- door is open
+    signal QUP : STD_LOGIC; -- elevator travelling up
     signal QDOWN : STD_LOGIC; -- elevator travelling down
+    
 begin
     -- Internal signals
     BL_MASK <= unsigned(EF) - 1;
     AB_MASK <= not(BL_MASK) sll 1;
-    ALL_REQ <= unsigned(('0' & UP_REQ) or (DN_REQ & '0') or GO_REQ);
-    AB_REQ <= '1' when (ALL_REQ and AB_MASK) > 0 else '0';
-    BL_REQ <= '1' when (ALL_REQ and BL_MASK) > 0 else '0';
+    ALL_REQ <= ('0' & UP_REQ) or (DN_REQ & '0') or GO_REQ;
+    AB_REQ <= '1' when (UNSIGNED(ALL_REQ) and AB_MASK) > 0 else '0';
+    BL_REQ <= '1' when (UNSIGNED(ALL_REQ) and BL_MASK) > 0 else '0';
     
-    EF_UP_REQ <= '1' when unsigned(EF and ('0' & UP_REQ)) > 0 else '0';
-    EF_DN_REQ <= '1' when unsigned(EF and (DN_REQ & '0')) > 0 else '0';
-    EF_GO_REQ <= '1' when unsigned(EF and GO_REQ) > 0 else '0';
+    EF_UP_REQ <= '1' when UNSIGNED(EF and ('0' & UP_REQ)) > 0 else '0';
+    EF_DN_REQ <= '1' when UNSIGNED(EF and (DN_REQ & '0')) > 0 else '0';
+    EF_GO_REQ <= '1' when UNSIGNED(EF and GO_REQ) > 0 else '0';
+    
+    EF_DOOR <= EF_GO_REQ or (EF_UP_REQ and not(QDOWN)) or (EF_DN_REQ and not(QUP));
     
     -- Output
     FLOOR_IND <= EF; -- (honestly, why is this even here?)
@@ -76,77 +81,48 @@ begin
     process (SYSCLK)
     begin
         if SYSCLK'event and SYSCLK='1' then
+        
             -- Clear outputs
-            EOPEN <= '0';
-            ECLOSE <= '0';
             EMVUP <= '0';
             EMVDN <= '0';
+            EOPEN <= '0';
+            ECLOSE <= '0';
             
-            -- Power-on clear (clear state)
+            -- Power-on clear (clear elevator state)
             if POC='1' then
-                QDOOR <= '0';
+                QOPEN <= '0';
                 QUP <= '0';
                 QDOWN <= '0';
                 
             -- Elevator has no running operations
             elsif ECOMP='1' then
-                -- Close door if open
-                if QDOOR='1' then
-                    ECLOSE <= '1'; -- ECLOSE is only set here.
-                    QDOOR <= '0';
                 
-                -- Service 'go' request at current floor
-                elsif EF_GO_REQ='1' then
-                    QDOOR <= '1';
-                    
-                -- Elevator is travelling up
-                elsif QUP='1' then
-                    -- Up request at current floor
-                    if EF_UP_REQ='1' then
-                        QDOOR <= '1';
-                    -- Request above current floor
-                    elsif AB_REQ='1' then
-                    -- Request below current floor
-                    elsif BL_REQ='1' then
-                        QUP <= '0';
-                        QDOWN <= '1';
-                    -- No requests
-                    else
-                        QUP <= '0';
+                if QOPEN='1' then
+                
+                    if EF_DOOR='0' then
+                        ECLOSE <= '1';
+                        QOPEN <= '0';
+                        
                     end if;
-                    
-                -- Elevator is travelling down
-                elsif QDOWN='1' then
-                    -- Up request at current floor
-                    if EF_DN_REQ='1' then
-                        QDOOR <= '1';
-                    -- Request below current floor
-                    elsif BL_REQ='1' then
-                    -- Request above current floor
-                    elsif AB_REQ='1' then
-                        QUP <= '1';
-                        QDOWN <= '0';
-                    -- No requests
-                    else
-                        QDOWN <= '0';
-                    end if;
-                    
-                -- Elevator is standing still
                 else
-                    if EF_UP_REQ='1' then
+                    if EF_DOOR='1' then
+                        EOPEN <= '1';
+                        QOPEN <= '1';
+                        
+                    elsif AB_REQ='1' and QDOWN='0' then
+                        EMVUP <= '1';
                         QUP <= '1';
-                    elsif EF_DN_REQ='1' then
+                        
+                    elsif BL_REQ='1' and QUP='0' then
+                        EMVDN <= '1';
                         QDOWN <= '1';
-                    end if;
                     
+                    else
+                        QUP <= '0';
+                        QDOWN <= '0';
+                        
+                    end if;
                 end if;
-                
-                -- Set output based on state
-                EOPEN <= QDOOR;
-                EMVUP <= QUP and not(QDOWN);
-                EMVDN <= QDOWN and not(QUP);
-                -- NOTE: ECLOSE is set earlier, only when necessary
-                
             end if;
         end if;
     end process;
