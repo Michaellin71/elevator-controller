@@ -73,9 +73,9 @@ begin
                 ECOMP <= '0';   -- start blocking operation
                 
                 if EDOOR='1' then
-                    COUNTER <= "110";   -- set counter to 6
+                    COUNTER <= "101";   -- set counter to 5
                 else
-                    COUNTER <= "100";   -- set counter to 4
+                    COUNTER <= "011";   -- set counter to 3
                     if EMVUP='1' and EFLOOR(3)='0' then
                         EFLOOR <= EFLOOR sll 1;
                     elsif EMVDN='1' and EFLOOR(0)='0' then
