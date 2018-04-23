@@ -32,7 +32,7 @@ USE ieee.std_logic_1164.ALL;
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
 --USE ieee.numeric_std.ALL;
- 
+
 ENTITY test IS
 END test;
  
@@ -135,7 +135,25 @@ BEGIN
         wait for SYSCLK_period;
 
         -- insert stimulus here
+        UP_REQ(2) <= '1';
+        
+        wait for 1000 ms;
         UP_REQ(0) <= '1';
+        
+        wait for 1000 ms;
+        DN_REQ(3) <= '1';
+        
+        wait for 1000 ms;
+        GO_REQ(1) <= '1';
+        
+        wait for 1000 ms;
+        GO_REQ(1) <= '0';
+        
+        wait for 11000 ms;
+        UP_REQ(2) <= '0';
+        
+        wait for 12000 ms;
+        DN_REQ(3) <= '0';
 
         wait;
     end process;
